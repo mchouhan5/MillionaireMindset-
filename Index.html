@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Millionaire Mindset</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body,
+    html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      overflow: hidden;
+      background: cover;
+    }
+
+    .bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://i.ibb.co/PZd8q7m0/Cover.png') no-repeat center center fixed;
+      background-size: cover;
+      filter: blur(40px);
+      z-index: -1;
+    }
+
+    .content {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #login,
+    #protected {
+      text-align: center;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 25px;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+
+    input[type="password"] {
+      padding: 12px 20px;
+      font-size: 18px;
+      border: 2px solid gold;
+      border-radius: 30px;
+      outline: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      text-align: center;
+      width: 250px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: gold;
+      color: black;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    #protected {
+      display: none;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .player {
+      width: 320px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      padding: 20px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      backdrop-filter: blur(5px);
+      filter: brightness(1.2);
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: gold;
+      cursor: pointer;
+      box-shadow: 0 0 5px gold;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: gold;
+      cursor: pointer;
+      box-shadow: 0 0 5px gold;
+    }
+
+    .cover-img {
+      width: 100%;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .song-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .artist {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+
+    #seekBar {
+      width: 100%;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #time {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .play-btn-wrap {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .control-btn {
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 25px;
+      cursor: pointer;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg"></div>
+
+  <div class="content">
+    <div id="login">
+      <h2>Enter Password to Access</h2>
+      <input type="password" id="password" placeholder="Enter Password">
+      <br><br>
+      <button onclick="checkPassword()">Enter</button>
+    </div>
+
+    <div id="protected">
+      <div class="player">
+        <img class="cover-img" src="https://i.ibb.co/PZd8q7m0/Cover.png" alt="Cover">
+        <div class="song-title" id="songTitle">Millionaire Mindset</div>
+        <div class="artist">by Robert Kiyosaki</div>
+
+        <div class="controls">
+          <input type="range" id="seekBar" value="0">
+          <div id="time">00:00 / 00:00</div>
+        </div>
+
+        <div class="play-btn-wrap">
+          <button class="control-btn" onclick="prevTrack()"><i class="fa fa-backward"></i></button>
+          <button class="control-btn" id="playPause"><i class="fa fa-play"></i></button>
+          <button class="control-btn" onclick="nextTrack()"><i class="fa fa-forward"></i></button>
+        </div>
+
+        <audio id="audio"></audio>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const correctPassword = "multimoney2";
+    const audio = document.getElementById("audio");
+    const playPause = document.getElementById("playPause");
+    const seekBar = document.getElementById("seekBar");
+    const time = document.getElementById("time");
+    const songTitle = document.getElementById("songTitle");
+
+    const playlist = [
+      {title: "Millionaire Mindset", src: "https://github.com/mchouhan5/Millionaire-Mindset-/raw/refs/heads/main/multi.mp3"},
+      {title: "Millionaire Mindset", src: "audio2.mp3"}, // Add more if needed
+    ];
+    let currentTrack = 0;
+
+    function loadTrack(index) {
+      const track = playlist[index];
+      audio.src = track.src;
+      songTitle.textContent = track.title;
+      playPause.innerHTML = '<i class="fa fa-play"></i>';
+    }
+
+    function checkPassword() {
+      const entered = document.getElementById("password").value;
+      if (entered === correctPassword) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("protected").style.display = "block";
+        loadTrack(currentTrack);
+      } else {
+        alert("Galat password!");
+      }
+    }
+
+    playPause.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playPause.innerHTML = '<i class="fa fa-pause"></i>';
+      } else {
+        audio.pause();
+        playPause.innerHTML = '<i class="fa fa-play"></i>';
+      }
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      seekBar.value = (audio.currentTime / audio.duration) * 100 || 0;
+      let current = formatTime(audio.currentTime);
+      let total = formatTime(audio.duration);
+      time.innerText = `${current} / ${total}`;
+    });
+
+    seekBar.addEventListener("input", () => {
+      audio.currentTime = (seekBar.value * audio.duration) / 100;
+    });
+
+    function formatTime(seconds) {
+      let min = Math.floor(seconds / 60);
+      let sec = Math.floor(seconds % 60);
+      return `${min < 10 ? "0" : ""}${min}:${sec < 10 ? "0" : ""}${sec}`;
+    }
+
+    function nextTrack() {
+      currentTrack = (currentTrack + 10) % playlist.length;
+      loadTrack(currentTrack);
+      audio.play();
+      playPause.innerHTML = '<i class="fa fa-pause"></i>';
+    }
+
+    function prevTrack() {
+      currentTrack = (currentTrack - 10 + playlist.length) % playlist.length;
+      loadTrack(currentTrack);
+      audio.play();
+      playPause.innerHTML = '<i class="fa fa-pause"></i>';
+    }
+  </script>
+
+</body>
+
+</html>
